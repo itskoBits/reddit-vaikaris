@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f9f6">
+  <meta name="description" content="Разгледай постовете и коментарите в Reddit архива на u/Vaikaris.">
+  <title>u/Vaikaris — Reddit архив</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" type="module"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Към съдържанието</a>
+  <aside class="sidebar">
+    <a class="brand" href="./" aria-label="Начало на архива"><span class="brand-mark">r<span>•</span></span><span>reddit<span class="brand-divider">/</span><span class="brand-light">архив</span></span></a>
+    <div class="profile"><div class="avatar">v<span></span></div><h2>u/Vaikaris</h2><p>Един профил. Всички разговори.</p></div>
+    <p class="nav-label">БИБЛИОТЕКА</p>
+    <nav class="type-nav" aria-label="Тип съдържание">
+      <button class="nav-item active" data-type="all" aria-current="page"><span class="nav-icon" data-icon="grid"></span>Всичко<span class="nav-count" id="nav-total">—</span></button>
+      <button class="nav-item" data-type="comment"><span class="nav-icon" data-icon="comment"></span>Коментари<span class="nav-count" id="nav-comments">—</span></button>
+      <button class="nav-item" data-type="post"><span class="nav-icon" data-icon="post"></span>Постове<span class="nav-count" id="nav-posts">—</span></button>
+    </nav>
+    <div class="community-heading"><p class="nav-label">ОБЩНОСТИ</p><span id="community-count">—</span></div>
+    <nav id="communities" class="community-nav" aria-label="Популярни общности"></nav>
+    <button class="all-communities" id="all-communities">Всички общности <span aria-hidden="true">↗</span></button>
+    <div class="sidebar-footer"><span class="status-dot"></span><span>Отворен архив</span><p>Запазени разговори.<br>Готови за преоткриване.</p></div>
+  </aside>
+  <main id="main">
+    <header class="topbar"><div>Библиотека <span>/</span> <strong id="breadcrumb">Всичко</strong></div><span class="archive-chip"><span class="status-dot"></span>Архив до септември 2025</span></header>
+    <div class="main-inner">
+      <section class="intro"><div class="eyebrow">REDDIT, ПОДРЕДЕН.</div><h1>Всяка дума има история<span>.</span></h1><p>Разгледай постовете и коментарите на <strong>u/Vaikaris</strong>.</p><div class="date-range"><span data-icon="calendar"></span><span id="date-range">Зареждане на архива…</span></div></section>
+      <section class="stats" aria-label="Обобщение на архива">
+        <button class="stat active" data-type="all"><span class="stat-top">Всички записи<span data-icon="archive"></span></span><span class="stat-number" id="stat-total">—</span><span class="stat-caption">парченца от историята</span></button>
+        <button class="stat" data-type="comment"><span class="stat-top">Коментари<span data-icon="comment"></span></span><span class="stat-number" id="stat-comments">—</span><span class="stat-caption">отговори и разговори</span></button>
+        <button class="stat" data-type="post"><span class="stat-top">Постове<span data-icon="post"></span></span><span class="stat-number" id="stat-posts">—</span><span class="stat-caption">началото на една дискусия</span></button>
+      </section>
+      <section class="browser-section" aria-label="Разглеждане на архива">
+        <div id="archive-status" class="archive-status" hidden><span id="archive-status-text" role="status" aria-live="polite"></span><progress id="archive-progress" max="100" value="0" aria-label="Зареждане на архива"></progress><button id="retry-archive" hidden>Опитай отново</button></div>
+        <div class="search-box"><span data-icon="search"></span><input id="search" type="search" aria-label="Търси в архива" maxlength="500" placeholder="Търси дума, фраза или тема…" autocomplete="off"><kbd aria-hidden="true">/</kbd></div>
+        <div class="filter-row"><div class="filter-group"><label class="select-wrap"><span data-icon="globe"></span><select id="subreddit" aria-label="Общност"><option value="">Всички общности</option></select></label><label class="select-wrap year-select"><span data-icon="calendar"></span><select id="year" aria-label="Година"><option value="">Всички години</option></select></label></div><label class="select-wrap sort-select"><span data-icon="sort"></span><select id="sort" aria-label="Подреждане"><option value="newest">Най-нови първо</option><option value="oldest">Най-стари първо</option><option value="top">Най-висока оценка</option><option value="bottom">Най-ниска оценка</option></select></label></div>
+        <div id="active-filters" class="active-filters" hidden></div>
+        <div class="results-heading"><h2 id="results-title">Последна активност</h2><span id="result-count" role="status" aria-live="polite">Зареждане…</span></div>
+        <div id="results" aria-busy="true"><div class="loading-state"><span class="spinner"></span>Зареждаме разговорите…</div></div>
+        <nav id="pagination" class="pagination" aria-label="Страници" hidden></nav>
+      </section>
+      <footer class="main-footer"><span>Малък прозорец към голям архив.</span><span>Данните са моментна снимка от Reddit.</span></footer>
+    </div>
+  </main>
+  <noscript>За търсене и разглеждане на архива включи JavaScript в браузъра.</noscript>
+  <dialog id="detail" aria-labelledby="detail-title"><div class="detail-shell"><div class="detail-top"><span>ПОГЛЕД ОТБЛИЗО</span><button id="close-detail" class="icon-button" aria-label="Затвори подробностите"><span data-icon="close"></span></button></div><div id="detail-content"></div></div></dialog>
+</body>
+</html>
