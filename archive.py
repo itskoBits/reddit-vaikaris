@@ -16,6 +16,15 @@ def safe_url(value):
     return value if urlsplit(value).scheme in ("http", "https") else ""
 
 
+def search_terms(query):
+    terms = query.split()
+    if not terms:
+        return []
+    terms[0] = query[:len(query) - len(query.lstrip())] + terms[0]
+    terms[-1] += query[len(query.rstrip()):]
+    return terms
+
+
 class Archive:
     def __init__(self, directory=ROOT):
         self.items = {}
@@ -80,7 +89,7 @@ class Archive:
         kind = params.get("type", "all")
         sort = params.get("sort", "newest")
         year = params.get("year", "")
-        query = params.get("q", "").strip()
+        query = params.get("q", "")
         subreddit = params.get("subreddit", "")
         if kind not in ("all", "post", "comment") or sort not in self.ordered:
             raise ValueError("Невалиден филтър.")
@@ -88,7 +97,7 @@ class Archive:
             raise ValueError("Търсенето е ограничено до 500 символа.")
         year = int(year) if year else None
         page = max(1, int(params.get("page", "1")))
-        terms = query.casefold().split()
+        terms = search_terms(query.casefold())
         matches = [x for x in self.ordered[sort]
                    if (kind == "all" or x["kind"] == kind)
                    and (not year or x["year"] == year)

@@ -4,7 +4,7 @@ import {readFileSync} from "node:fs";
 import {gunzipSync} from "node:zlib";
 import {createHash} from "node:crypto";
 import {spawnSync} from "node:child_process";
-import {ArchiveIndex} from "../web/archive-core.mjs";
+import {ArchiveIndex, searchTerms} from "../web/archive-core.mjs";
 
 const root = new URL("../", import.meta.url);
 const dist = new URL("dist/", root);
@@ -18,6 +18,24 @@ const rows = manifest.chunks.flatMap((chunk) => {
   return rows;
 });
 const index = new ArchiveIndex(rows, manifest.tables);
+
+test("outer spaces distinguish word prefixes and suffixes while keeping multi-word search", () => {
+  const texts = ["за раждане тук после", "за възраждане тук после", "за раждането тук после", "за прераждане тук после"];
+  const fixtureRows = texts.map((text, n) => [`t1_${n}`, 0, 0, "", text, 1704067200, 1, 0, "", "", "", "", ""]);
+  const fixture = new ArchiveIndex(fixtureRows, {communities: ["test"], authors: ["test"]});
+  const matches = (q) => fixture.query({q}).items.map((item) => item.id).sort();
+  assert.deepEqual(matches("раждане"), ["t1_0", "t1_1", "t1_2", "t1_3"]);
+  assert.deepEqual(matches(" раждане"), ["t1_0", "t1_2"]);
+  assert.deepEqual(matches("раждане "), ["t1_0", "t1_1", "t1_3"]);
+  assert.deepEqual(matches(" раждане "), ["t1_0"]);
+  assert.deepEqual(matches(" РАЖДАНЕ "), ["t1_0"]);
+  assert.deepEqual(matches("раждане за"), ["t1_0", "t1_1", "t1_2", "t1_3"]);
+  assert.deepEqual(matches(" раждане тук "), ["t1_0", "t1_2"]);
+  assert.deepEqual(matches("  раждане"), []);
+  assert.equal(fixture.query({q: "   "}).total, 4);
+  assert.deepEqual(searchTerms(" раждане "), [" раждане "]);
+  assert.deepEqual(searchTerms("  раждане   тук  "), ["  раждане", "тук  "]);
+});
 
 test("built archive contains every unique record, preserves previews and full text", () => {
   assert.equal(rows.length, manifest.meta.total);
@@ -38,6 +56,7 @@ test("search, Cyrillic, literal punctuation, sorting and pagination match the Py
     ...["all", "post", "comment"].flatMap((type) => ["newest", "oldest", "top", "bottom"].map((sort) => ({type, sort, page: 2}))),
     {q: "БЪЛГАРИЯ", year: "2025", sort: "top"}, {q: "роди", sort: "oldest"},
     {q: 'роди "', sort: "oldest"}, {q: "евро България", type: "comment"},
+    ...["раждане", " раждане", "раждане ", " раждане ", " раждане деца ", "  раждане", "   "].map((q) => ({q})),
     {q: "[", sort: "bottom"}, {q: "несъществуващазаявка123456"},
     {subreddit: "bulgaria", type: "post", year: "2023"}, {subreddit: "missing"},
     {page: 999999}, {type: "post", page: -5},

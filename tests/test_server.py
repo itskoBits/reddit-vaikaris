@@ -56,6 +56,13 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(self.archive.query({"q": "does-not-exist"})["total"], 0)
         self.assertEqual(self.archive.query({"type": "post", "year": "2024"})["total"], 0)
 
+    def test_search_preserves_outer_spaces(self):
+        self.assertEqual(self.archive.query({"q": "Българ"})["total"], 26)
+        self.assertEqual(self.archive.query({"q": "Българ "})["total"], 0)
+        self.assertEqual(self.archive.query({"q": "Евро ", "type": "post"})["total"], 1)
+        self.assertEqual(self.archive.query({"q": "  Евро", "type": "post"})["total"], 0)
+        self.assertEqual(self.archive.query({"q": "   "})["total"], 26)
+
     def test_sorting_and_negative_scores(self):
         top = self.archive.query({"sort": "top"})
         bottom = self.archive.query({"sort": "bottom"})

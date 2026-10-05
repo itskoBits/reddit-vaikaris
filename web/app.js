@@ -1,4 +1,5 @@
 import {ArchiveClient} from "./archive-client.js";
+import {searchTerms} from "./archive-core.mjs";
 
 const $ = (selector) => document.querySelector(selector);
 const icons = {
@@ -48,8 +49,8 @@ function syncUrl(item = selectedItem, push = false) {
 }
 
 function highlight(text) {
-  if (!state.q.trim()) return escape(text);
-  const terms = [...new Set(state.q.trim().split(/\s+/))].sort((a,b) => b.length - a.length);
+  const terms = [...new Set(searchTerms(state.q))].sort((a,b) => b.length - a.length);
+  if (!terms.length) return escape(text);
   const pattern = new RegExp(terms.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "giu");
   let result = "", offset = 0;
   for (const match of String(text).matchAll(pattern)) {
@@ -110,7 +111,7 @@ function renderControls() {
   $("#breadcrumb").textContent = labels[state.type];
   const filtered = state.q || state.subreddit || state.year;
   $("#results-title").textContent = filtered ? "Резултати от архива" : state.type === "all" ? (state.sort === "newest" ? "Последна активност" : "Всички записи") : labels[state.type];
-  const chips = [["q", state.q && `Търсене: ${state.q}`], ["subreddit", state.subreddit && `r/${state.subreddit}`], ["year", state.year]];
+  const chips = [["q", state.q && `Търсене: „${state.q}“`], ["subreddit", state.subreddit && `r/${state.subreddit}`], ["year", state.year]];
   $("#active-filters").hidden = !filtered;
   $("#active-filters").innerHTML = chips.filter(([, value]) => value).map(([key, value]) => `<button class="filter-chip" data-clear="${key}" aria-label="Премахни ${escape(value)}">${escape(value)}${icon("close")}</button>`).join("") + '<button class="clear-filters" data-reset>Изчисти филтрите</button>';
   renderCommunityButtons();
@@ -201,7 +202,7 @@ function emptyState(title, description, action, attribute) {
 
 function changeState(patch, scroll = false) {
   clearTimeout(searchTimer);
-  state = {...state, q:$("#search").value.trim(), page:1, ...patch};
+  state = {...state, q:$("#search").value, page:1, ...patch};
   renderControls();
   syncUrl();
   loadItems(scroll);
@@ -277,10 +278,10 @@ $("#search").addEventListener("input", () => {
   clearTimeout(searchTimer);
   // Cancel the previous search immediately, before the debounce elapses.
   listController?.abort();
-  searchTimer = setTimeout(() => changeState({q:$("#search").value.trim()}), 220);
+  searchTimer = setTimeout(() => changeState({q:$("#search").value}), 220);
 });
 $("#search").addEventListener("keydown", (event) => {
-  if (event.key === "Enter") changeState({q:$("#search").value.trim()});
+  if (event.key === "Enter") changeState({q:$("#search").value});
 });
 for (const key of ["subreddit", "year", "sort"]) $(`#${key}`).addEventListener("change", (event) => changeState({[key]:event.target.value}));
 document.addEventListener("click", (event) => {

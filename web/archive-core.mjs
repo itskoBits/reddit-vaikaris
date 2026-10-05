@@ -2,6 +2,17 @@
 export const PAGE_SIZE = 20;
 const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 
+export function searchTerms(query) {
+  const text = String(query);
+  if (!text.trim()) return [];
+  const terms = text.trim().split(/\s+/);
+  // Keep intentional outer spaces on the first and last search terms.
+  // Internal separators retain the existing "all words, any order" behavior.
+  terms[0] = text.match(/^\s*/)[0] + terms[0];
+  terms[terms.length - 1] += text.match(/\s*$/)[0];
+  return terms;
+}
+
 export class ArchiveIndex {
   constructor(rows, tables) {
     this.rows = rows;
@@ -42,7 +53,7 @@ export class ArchiveIndex {
     const {type = "all", sort = "newest", subreddit = "", year = "", q = ""} = params;
     if (!["all", "post", "comment"].includes(type) || !Object.hasOwn(this.ordered, sort)) throw new Error("Невалиден филтър.");
     if (String(q).length > 500 || (year && !Number.isInteger(Number(year)))) throw new Error("Невалидни параметри за търсене.");
-    const terms = String(q).trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const terms = searchTerms(q).map((term) => term.toLowerCase());
     const community = subreddit ? this.tables.communities.findIndex((name) => name.toLowerCase() === subreddit.toLowerCase()) : -1;
     const matches = [];
     for (const index of this.ordered[sort]) {
